@@ -1,27 +1,29 @@
 import boto3
 import json
 
+# Cliente Bedrock Runtime
 client = boto3.client(
     service_name='bedrock-runtime',
     region_name='us-east-2'
 )
 
-# Claude Sonnet 4.5 (MAIS RECENTE) ⭐
+# Claude Sonnet 4.5 (Inference Profile)
 claude_model_id = 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
 
-# Configuração corrigida - apenas temperature (SEM top_p e top_k)
+# Configuração da requisição (Messages API)
 claude_config = json.dumps({
     "anthropic_version": "bedrock-2023-05-31",
-    "max_tokens": 300,
-    "temperature": 0.5,  # Use APENAS temperature OU top_p, nunca os dois
+    "max_tokens": 500,  # Aumentado para evitar resposta cortada
+    "temperature": 0.5,
     "messages": [
         {
             "role": "user",
-            "content": "Quais são as melhores opções de sandálias para uma caminhada na praia? Forneça uma resposta concisa com no máximo 300 caracteres, ideal para um e-commerce de roupas e itens de vestuário."
+            "content": "Quais são as melhores opções de sandálias para uma caminhada na praia? Forneça uma resposta detalhada e bem formatada."
         }
     ]
 })
 
+# Invocação do modelo
 response = client.invoke_model(
     body=claude_config,
     modelId=claude_model_id,
@@ -29,9 +31,13 @@ response = client.invoke_model(
     contentType="application/json"
 )
 
-resposta_json = json.loads(response['body'].read().decode('utf-8'))
-texto_resposta = resposta_json['content'][0]['text']
+# Tratamento da resposta usando dicionário Python
+resposta = json.loads(response['body'].read().decode('utf-8'))
 
-print("Resposta:")
-print(texto_resposta)
-print(f"\n✅ Modelo usado: {claude_model_id}")
+# Extração do texto da resposta (Claude 3+ usa 'content')
+completion = resposta.get('content', [{}])[0].get('text', 'Resposta não encontrada')
+
+# Formatação da resposta
+resposta_formatada = f"Resposta:\n{completion}\n"
+
+print(resposta_formatada)
