@@ -1,0 +1,33 @@
+aws bedrock list-foundation-models --region us-east-2
+
+📊 Resumo dos Principais Modelos Disponíveis:
+🤖 Anthropic Claude (Modelos de Texto e Imagem)
+
+Claude Sonnet 4.5 → anthropic.claude-sonnet-4-5-20250929-v1:0 ⭐ (Mais recente e inteligente)
+Claude Opus 4.1 → anthropic.claude-opus-4-1-20250805-v1:0 (Mais poderoso)
+Claude Sonnet 4 → anthropic.claude-sonnet-4-20250514-v1:0
+Claude 3.7 Sonnet → anthropic.claude-3-7-sonnet-20250219-v1:0
+Claude 3.5 Haiku → anthropic.claude-3-5-haiku-20241022-v1:0 (Mais rápido/barato)
+
+🔷 Amazon Nova (Multimodal - Texto, Imagem, Vídeo)
+
+Nova Premier → amazon.nova-premier-v1:0 (Mais avançado)
+Nova Pro → amazon.nova-pro-v1:0
+Nova Lite → amazon.nova-lite-v1:0
+Nova Micro → amazon.nova-micro-v1:0 (Mais barato)
+
+🦙 Meta Llama (Open Source)
+
+Llama 4 Scout/Maverick → meta.llama4-scout-17b-instruct-v1:0
+Llama 3.3 70B → meta.llama3-3-70b-instruct-v1:0
+Llama 3.1 405B → meta.llama3-1-405b-instruct-v1:0 (Maior)
+
+🎨 Stability AI (Geração de Imagens)
+
+Stable Image (várias ferramentas de edição)
+
+🧠 Outros
+
+DeepSeek R1 → deepseek.r1-v1:0
+Mistral Pixtral Large → mistral.pixtral-large-2502-v1:0
+Embeddings: Cohere Embed v4, Amazon Titan
