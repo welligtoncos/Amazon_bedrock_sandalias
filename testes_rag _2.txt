@@ -1,0 +1,68 @@
+prompt_augmented = f"""PRODUTOS DISPONÍVEIS NO ESTOQUE:
+{produtos_formatados}
+
+PERGUNTA DO CLIENTE:
+{prompt_original}
+
+INSTRUÇÕES:
+Use as informações dos produtos acima...
+```
+
+### **5. Comando Extra: Listar Produtos**
+```
+User: produtos
+```
+Lista todos os produtos do catálogo
+
+---
+
+## 🧪 **Testes Sugeridos**
+
+### **Teste 1: Produto Existente**
+```
+User: óculos de sol
+```
+**Esperado:**
+```
+Assistente:
+Óculos de Sol por R$89,90! Com proteção UV400 e armação resistente.
+Temos 15 unidades em estoque. Perfeitos para dias ensolarados!
+```
+
+---
+
+### **Teste 2: Busca Parcial**
+```
+User: moda praia
+```
+**Esperado:**
+```
+Assistente:
+Para praia, temos Sandália de Praia (R$45,90, 25 un.) - confortável
+com solado antiderrapante. Ideal para areia e água!
+```
+
+---
+
+### **Teste 3: Pergunta Fora do Escopo**
+```
+User: Qual é o maior país do mundo?
+```
+**Esperado:**
+```
+Assistente:
+Desculpe, só posso ajudar com produtos de moda e vestuário!
+Que tal procurar roupas, calçados ou acessórios? Temos ótimas opções!
+```
+
+---
+
+### **Teste 4: Produto Inexistente**
+```
+User: notebook
+```
+**Esperado:**
+```
+Assistente:
+Não encontrei "notebook" em nosso catálogo de moda. Procura roupas,
+calçados ou acessórios? Posso ajudar com sandálias, vestidos, jaquetas...
