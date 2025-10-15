@@ -1,0 +1,196 @@
+User: Sandália de Praia
+User: Óculos de Sol
+User: Moletom de Lã Cinza
+User: Cachecol de Tricô
+User: Vestido de Verão
+User: Bermuda Cargo
+User: Camiseta Branca
+User: Jaqueta Jeans
+```
+
+**✅ Esperado:** Resposta com preço, quantidade e detalhes específicos do produto
+
+---
+
+## 🔍 **TESTE 2: Busca Parcial (LIKE)**
+```
+User: sandália
+User: óculos
+User: moletom
+User: cachecol
+User: vestido
+User: bermuda
+User: camiseta
+User: jaqueta
+```
+
+**✅ Esperado:** Deve encontrar mesmo digitando só parte do nome
+
+---
+
+## ❌ **TESTE 3: Produtos Inexistentes**
+```
+User: tênis de corrida
+User: notebook
+User: celular
+User: sapato social
+User: gravata
+User: relógio
+User: chinelo
+User: bolsa
+```
+
+**✅ Esperado:** Mensagem de "Nenhum produto encontrado"
+
+---
+
+## 🤔 **TESTE 4: Perguntas Naturais**
+```
+User: O que você tem para ir à praia?
+User: Preciso de algo para o frio
+User: Tem roupa de verão?
+User: Quero algo casual
+User: O que é bom para o calor?
+User: Tem acessórios?
+```
+
+**✅ Esperado:** Deve identificar produtos relacionados (sandália, moletom, vestido, etc.)
+
+---
+
+## 💰 **TESTE 5: Perguntas sobre Preço**
+```
+User: Quanto custa a sandália?
+User: Qual o preço do óculos?
+User: Quanto está o moletom?
+User: Tem algo abaixo de R$50?
+User: Qual o produto mais caro?
+User: Qual o mais barato?
+```
+
+**✅ Esperado:** Deve mencionar preços específicos baseados no banco
+
+---
+
+## 📦 **TESTE 6: Perguntas sobre Estoque**
+```
+User: Tem sandália disponível?
+User: Quantas camisetas você tem?
+User: Tem moletom em estoque?
+User: O que tem bastante quantidade?
+User: O que está acabando?
+```
+
+**✅ Esperado:** Deve mencionar quantidades do banco
+
+---
+
+## 🎯 **TESTE 7: Comparações**
+```
+User: Qual a diferença entre sandália e bermuda?
+User: O que é melhor para praia?
+User: Compare moletom e cachecol
+User: Qual é mais caro, jaqueta ou vestido?
+```
+
+**✅ Esperado:** Deve usar dados de AMBOS os produtos do banco
+
+---
+
+## 🔄 **TESTE 8: Histórico de Conversa**
+```
+User: Moletom de Lã
+User: Quanto custa?
+User: Tem em outras cores?
+User: Qual o tamanho?
+User: Vou levar esse
+```
+
+**✅ Esperado:** Deve manter contexto da conversa anterior (sobre o moletom)
+
+---
+
+## 🌐 **TESTE 9: Palavras-chave Múltiplas**
+```
+User: sandália praia
+User: roupa frio
+User: acessório sol
+User: roupa verão
+User: calçado confortável
+```
+
+**✅ Esperado:** Deve encontrar produtos que contenham qualquer palavra-chave
+
+---
+
+## 🔤 **TESTE 10: Variações de Escrita**
+```
+User: SANDÁLIA
+User: sandalia (sem acento)
+User: SaNdÁlIa (misto)
+User: oculos (sem acento)
+User: MOLETOM
+```
+
+**✅ Esperado:** Busca case-insensitive deve funcionar
+
+---
+
+## 📊 **TESTE 11: Listagens**
+```
+User: Me mostre todos os produtos
+User: O que você tem?
+User: Lista de produtos
+User: Catálogo completo
+User: Quais são suas opções?
+```
+
+**✅ Esperado:** Deve listar múltiplos produtos (ou mencionar categorias)
+
+---
+
+## 🎨 **TESTE 12: Atributos Específicos**
+```
+User: Tem algo de couro?
+User: Qual roupa tem capuz?
+User: Tem produto com proteção UV?
+User: O que é de algodão?
+User: Tem roupa com bolsos?
+```
+
+**✅ Esperado:** Deve buscar na descrição dos produtos
+
+---
+
+## 💬 **TESTE 13: Conversação Natural**
+```
+User: Oi, tudo bem?
+User: Bom dia!
+User: Obrigado
+User: Pode me ajudar?
+User: Estou procurando um presente
+```
+
+**✅ Esperado:** Resposta amigável + sugestão de produtos
+
+---
+
+## 🚫 **TESTE 14: Entrada Inválida**
+```
+User: 
+User: ...
+User: ???
+User: 12345
+User: @#$%
+```
+
+**✅ Esperado:** Não deve crashar, resposta educada pedindo esclarecimento
+
+---
+
+## 🔄 **TESTE 15: Comandos do Sistema**
+```
+User: sair
+User: exit
+User: quit
+User: SAIR
