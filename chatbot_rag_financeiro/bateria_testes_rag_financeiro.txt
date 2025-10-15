@@ -1,0 +1,99 @@
+================================================================================
+BATERIA DE TESTES RAG - 20 CONSULTAS
+================================================================================
+
+INSTRUCOES:
+- Copie cada pergunta
+- Cole no chatbot
+- Marque OK se funcionou ou FALHA se não funcionou
+
+================================================================================
+NIVEL 1 - BASICO (5 testes)
+================================================================================
+
+TESTE 01
+Qual a receita total?
+
+TESTE 02
+Quantos funcionários temos?
+
+TESTE 03
+Quais tipos de impostos pagamos?
+
+TESTE 04
+Quanto pagamos de IRPJ?
+
+TESTE 05
+Receita do Projeto Alpha
+
+================================================================================
+NIVEL 2 - INTERMEDIARIO (5 testes)
+================================================================================
+
+TESTE 06
+Qual a receita da RSM Brasil?
+
+TESTE 07
+Top 5 impostos mais caros
+
+TESTE 08
+Quantos funcionários no TI?
+
+TESTE 09
+Quantas contas estão pendentes?
+
+TESTE 10
+Projetos com Petrobras
+
+================================================================================
+NIVEL 3 - AVANCADO (5 testes)
+================================================================================
+
+TESTE 11
+Compare receitas RSM e Pollvo
+
+TESTE 12
+Compare receitas dos últimos 3 meses
+
+TESTE 13
+Salário médio por departamento
+
+TESTE 14
+Situação financeira geral
+
+TESTE 15
+Projetos mais lucrativos da Pollvo
+
+================================================================================
+NIVEL 4 - COMPLEXO (5 testes)
+================================================================================
+
+TESTE 16
+Qual o custo total considerando folha e impostos?
+
+TESTE 17
+Quanto representam os impostos da receita em percentual?
+
+TESTE 18
+Qual empresa tem melhor receita por funcionário?
+
+TESTE 19
+Evolução da folha de pagamento nos últimos 3 meses
+
+TESTE 20
+Qual departamento tem melhor custo benefício comparando receita e folha?
+
+================================================================================
+RESULTADOS
+================================================================================
+
+NIVEL 1: ___/5
+NIVEL 2: ___/5
+NIVEL 3: ___/5
+NIVEL 4: ___/5
+
+TOTAL: ___/20
+
+TAXA: ___%
+
+================================================================================

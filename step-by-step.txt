@@ -36,3 +36,5 @@ Embeddings: Cohere Embed v4, Amazon Titan
 Quais são as melhores opções de sandálias para uma caminhada na praia? Forneça uma resposta detalhada e bem formatada.
 
 venv\Scripts\Activate.ps1
+
+https://us-east-2.console.aws.amazon.com/bedrock/home?region=us-east-2#/inference-profiles/us.anthropic.claude-3-haiku-20240307-v1:0
