@@ -1,0 +1,42 @@
+# .dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docs
+README.md
+docs/
+
+# Tests
+tests/
+*.test.py
+
+# Cache
+.cache/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+terraform/
+*.tfstate
+*.tfvars

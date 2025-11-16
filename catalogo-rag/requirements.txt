@@ -1,0 +1,12 @@
+# requirements.txt
+
+# AWS
+boto3==1.34.44
+botocore==1.34.44
+
+# LangChain
+langchain-aws==0.1.7
+langchain-core==0.1.23
+
+# Outros
+python-dotenv==1.0.1

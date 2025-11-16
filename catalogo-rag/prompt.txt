@@ -1,0 +1,25 @@
+1. "Quais sandálias vocês têm?"
+2. "Tem sandália na cor preta?"
+3. "Quanto custa a sandália?"
+4. "Quais os tamanhos disponíveis?"
+5. "Tem sandália feminina?"
+6. "Quero uma sandália confortável"
+7. "Mostre sandálias esportivas"
+8. "Tem promoção?"
+
+9. "Qual a diferença entre sandália A e sandália B?"
+10. "Qual sandália é mais barata?"
+11. "Qual você recomenda para praia?"
+12. "O que é melhor para caminhada?"
+
+13. "Essa sandália é impermeável?"
+14. "Qual o material?"
+15. "Tem garantia?"
+16. "Como faço para comprar?"
+17. "Vocês entregam?"
+
+
+18. "Olá, tudo bem?"
+19. "Pode me ajudar?"
+20. "Obrigado!"
+21. "Tchau"
