@@ -23,3 +23,74 @@
 19. "Pode me ajudar?"
 20. "Obrigado!"
 21. "Tchau"
+
+
+# 1. Criar ambiente virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate  # Windows
+
+# 2. Instalar dependências
+pip install -r requirements.txt
+
+# 3. Criar banco de dados
+python criar_catalogo.py
+
+# 4. Executar aplicação
+python app.py
+
+# =============================================
+# PASSO 1: Verificar arquivos necessários
+# =============================================
+cd C:\projects-github\Amazon_bedrock_sandalias\catalogo-rag
+
+# Verificar se Dockerfile existe
+ls Dockerfile
+
+# Verificar se docker-compose.yml existe
+ls docker-compose.yml
+
+# =============================================
+# PASSO 2: BUILD (Criar a imagem)
+# =============================================
+# Opção A: Docker Compose (RECOMENDADO)
+docker-compose build
+
+# Opção B: Docker direto
+docker build -t catalogo-rag:latest .
+
+# =============================================
+# PASSO 3: Verificar se a imagem foi criada
+# =============================================
+docker images | Select-String "catalogo-rag"
+
+# Deve aparecer algo como:
+# catalogo-rag    latest    abc123...    2 minutes ago    500MB
+
+# =============================================
+# PASSO 4: RUN (Executar)
+# =============================================
+# Opção A: Docker Compose
+docker-compose up -d
+
+# Opção B: Docker direto
+docker run -it --rm `
+  --name catalogo-chatbot `
+  -e AWS_ACCESS_KEY_ID=key `
+  -e AWS_SECRET_ACCESS_KEY=key `
+  -e AWS_REGION=us-east-1 `
+  -v ${PWD}/data:/app/data `
+  catalogo-rag:latest
+
+  docker run -it --rm --name catalogo-chatbot -e AWS_ACCESS_KEY_ID=key -e AWS_SECRET_ACCESS_KEY=key -e AWS_REGION=us-east-1 -v ${PWD}/data:/app/data catalogo-rag:latest
+
+# =============================================
+# PASSO 5: Verificar
+# =============================================
+docker ps
+
+# =============================================
+# PASSO 6: Usar o chatbot
+# =============================================
+docker exec -it catalogo-rag-chatbot python app.py
