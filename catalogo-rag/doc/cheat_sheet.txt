@@ -1,0 +1,299 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│           🎯 CHEAT SHEET - DIAGRAMA DE CLASSES + REQUISITOS                 │
+│                    Sistema RAG Catálogo de Produtos                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                          📐 ARQUITETURA RAG EM 3 CAMADAS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────┐
+│   1️⃣ RETRIEVAL      │  Busca produtos relevantes
+├─────────────────────┤
+│ ProductRetriever    │──► Extrai palavras-chave (RF002)
+│ TextProcessor       │──► Identifica filtros (RF003)
+│ DatabaseManager     │──► Busca no banco (RF004)
+└─────────────────────┘
+         ↓
+┌─────────────────────┐
+│   2️⃣ AUGMENTED      │  Formata contexto
+├─────────────────────┤
+│ ContextAugmenter    │──► Formata produtos (RF005)
+│                     │──► Destaca promoções (RF011)
+└─────────────────────┘
+         ↓
+┌─────────────────────┐
+│   3️⃣ GENERATION     │  Gera resposta com IA
+├─────────────────────┤
+│ ResponseGenerator   │──► Chama Claude (RF006)
+│ AWS Bedrock         │──► Usa histórico (RF007)
+└─────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                              🎨 CLASSES DO SISTEMA
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ CatalogoRAG (Orquestrador Principal)                                     │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Coordena todo o pipeline RAG                                     │
+│ Métodos principais:                                                      │
+│   • processar_consulta(query) → Executa pipeline completo     [RF001]   │
+│   • mostrar_estatisticas()    → Exibe stats do catálogo       [RF008]   │
+│ Composição:                                                              │
+│   ♦───> ProductRetriever                                                 │
+│   ♦───> ContextAugmenter                                                 │
+│   ♦───> ResponseGenerator                                                │
+│   ♦───> DatabaseManager                                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ProductRetriever (Buscador de Produtos)                                  │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Encontrar produtos relevantes                                    │
+│ Métodos principais:                                                      │
+│   • retrieve(query, limit=5) → Retorna produtos relevantes              │
+│ Usa:                                                                     │
+│   ───> DatabaseManager (buscar dados)                                    │
+│   ───> TextProcessor (processar texto)                                   │
+│ Requisitos: RF001, RF002, RF003, RF004                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ContextAugmenter (Formatador de Contexto)                                │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Transformar produtos em texto formatado                          │
+│ Métodos principais:                                                      │
+│   • format_product(produto)$ → Formata 1 produto                         │
+│   • augment(produtos, query)$ → Formata todos produtos                   │
+│ Características:                                                         │
+│   • Métodos estáticos (não precisa instanciar)                           │
+│   • Adiciona emojis e formatação visual                                  │
+│   • Calcula e destaca descontos                                          │
+│ Requisitos: RF005, RF011                                                 │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ ResponseGenerator (Gerador de Respostas IA)                              │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Criar respostas naturais com Claude                              │
+│ Métodos principais:                                                      │
+│   • generate(query, context) → Gera resposta com IA                      │
+│   • _get_historico()         → Retorna histórico formatado               │
+│ Atributos:                                                               │
+│   - client: boto3.Client (AWS)                                           │
+│   - model: ChatBedrock (LangChain)                                       │
+│   - historico: list (últimas 10 interações)                              │
+│ Configurações:                                                           │
+│   - Modelo: Claude 3 Sonnet                                              │
+│   - Max Tokens: 500                                                      │
+│   - Temperature: 0.5                                                     │
+│ Requisitos: RF006, RF007                                                 │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ DatabaseManager (Gerenciador de Banco)                                   │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Interface com SQLite                                             │
+│ Métodos principais:                                                      │
+│   • get_connection()              → Retorna conexão SQLite               │
+│   • buscar_produtos(filtros)      → Busca com filtros          [RF004]  │
+│   • get_estatisticas()            → Gera estatísticas          [RF008]  │
+│   • _format_results(results)      → Formata resultados                   │
+│ Características:                                                         │
+│   • Valida existência do banco no __init__                     [RF010]  │
+│   • Busca case-insensitive com normalização                    [RF012]  │
+│   • Usa índices para performance                                         │
+│ Requisitos: RF004, RF008, RF010, RF012                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│ TextProcessor (Processador de Linguagem)                                 │
+├──────────────────────────────────────────────────────────────────────────┤
+│ Função: Processar e entender texto em português                          │
+│ Métodos principais:                                                      │
+│   • remover_acentos(texto)$           → Remove acentuação                │
+│   • singular(palavra)$                → Plural → Singular                │
+│   • extrair_palavras_chave(texto)$    → Extrai termos        [RF002]    │
+│   • extrair_filtros(texto)$           → Identifica filtros   [RF003]    │
+│ Atributos de classe:                                                     │
+│   + STOP_WORDS: set (palavras a ignorar)                                 │
+│   + CATEGORIAS: list (categorias válidas)                                │
+│ Características:                                                         │
+│   • Todos os métodos são estáticos                                       │
+│   • Suporte completo a português brasileiro                              │
+│ Requisitos: RF002, RF003, RF012                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                        🎯 REQUISITOS FUNCIONAIS (14 TOTAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+🔴 ALTA PRIORIDADE (6)
+├─ RF001: Consulta por linguagem natural       → CatalogoRAG
+├─ RF002: Extração de palavras-chave           → TextProcessor
+├─ RF004: Busca no banco de dados              → DatabaseManager
+├─ RF006: Geração de respostas com IA          → ResponseGenerator
+├─ RF009: Interface CLI                        → main()
+└─ RF010: Validação do banco de dados          → DatabaseManager
+
+🟡 MÉDIA PRIORIDADE (5)
+├─ RF003: Identificação de filtros             → TextProcessor
+├─ RF005: Formatação de produtos               → ContextAugmenter
+├─ RF007: Histórico de conversa                → ResponseGenerator
+├─ RF011: Destaque de promoções                → ContextAugmenter
+└─ RF012: Busca case-insensitive               → DatabaseManager
+
+🟢 BAIXA PRIORIDADE (3)
+├─ RF008: Estatísticas do catálogo             → DatabaseManager
+├─ RF013: Configuração centralizada            → settings.py
+└─ RF014: Debug e logging                      → ProductRetriever
+
+═══════════════════════════════════════════════════════════════════════════════
+                           💡 FLUXO DE UMA CONSULTA
+═══════════════════════════════════════════════════════════════════════════════
+
+    "Quero tênis Nike até R$ 500"
+              │
+              ├─► [RF009] CLI recebe input
+              │
+    ┌─────────▼──────────┐
+    │   CatalogoRAG      │
+    │ processar_consulta │ [RF001]
+    └─────────┬──────────┘
+              │
+    ┌─────────▼─────────────────────────────┐
+    │ ETAPA 1: RETRIEVAL                    │
+    │ ┌────────────────────────────────┐    │
+    │ │ TextProcessor                  │    │
+    │ │ • Extrai: ["tenis", "nike"]    │    │ [RF002]
+    │ │ • Filtros: {preco_max: 500}    │    │ [RF003]
+    │ └────────────────────────────────┘    │
+    │ ┌────────────────────────────────┐    │
+    │ │ DatabaseManager                │    │
+    │ │ • Busca produtos com filtros   │    │ [RF004]
+    │ │ • Retorna: 3 produtos          │    │ [RF012]
+    │ └────────────────────────────────┘    │
+    └───────────────┬───────────────────────┘
+                    │
+    ┌───────────────▼───────────────────────┐
+    │ ETAPA 2: AUGMENTED                    │
+    │ ┌────────────────────────────────┐    │
+    │ │ ContextAugmenter               │    │
+    │ │ • Formata cada produto         │    │ [RF005]
+    │ │ • Destaca promoções 🔥         │    │ [RF011]
+    │ │ • Cria contexto completo       │    │
+    │ └────────────────────────────────┘    │
+    └───────────────┬───────────────────────┘
+                    │
+    ┌───────────────▼───────────────────────┐
+    │ ETAPA 3: GENERATION                   │
+    │ ┌────────────────────────────────┐    │
+    │ │ ResponseGenerator              │    │
+    │ │ • Monta prompt + contexto      │    │ [RF006]
+    │ │ • Adiciona histórico           │    │ [RF007]
+    │ │ • Chama Claude (AWS Bedrock)   │    │
+    │ │ • Retorna resposta natural     │    │
+    │ └────────────────────────────────┘    │
+    └───────────────┬───────────────────────┘
+                    │
+    "Encontrei ótimas opções! O Nike Air Max
+     está em promoção por R$ 449,90..."
+
+═══════════════════════════════════════════════════════════════════════════════
+                            🔗 RELACIONAMENTOS
+═══════════════════════════════════════════════════════════════════════════════
+
+SÍMBOLOS:
+  ♦───>  Composição (possui, contém)
+  ───>   Associação (usa, depende)
+  ··>    Dependência (importa biblioteca)
+
+CatalogoRAG
+  ♦───> ProductRetriever
+  ♦───> ContextAugmenter
+  ♦───> ResponseGenerator
+  ♦───> DatabaseManager
+
+ProductRetriever
+  ───> DatabaseManager
+  ───> TextProcessor
+
+ResponseGenerator
+  ───> ChatBedrock (LangChain)
+  ───> boto3.Client (AWS)
+
+DatabaseManager
+  ··> sqlite3
+
+TextProcessor
+  ··> re (regex)
+  ··> unicodedata
+
+═══════════════════════════════════════════════════════════════════════════════
+                        ⚙️ CONFIGURAÇÕES PRINCIPAIS
+═══════════════════════════════════════════════════════════════════════════════
+
+AWS_REGION            = 'us-east-1'
+BEDROCK_MODEL_ID      = 'anthropic.claude-3-sonnet-20240229-v1:0'
+MAX_TOKENS            = 500
+TEMPERATURE           = 0.5
+TOP_P                 = 0.9
+DB_PATH               = 'data/catalogo.db'
+HISTORICO_MAX         = 10
+
+═══════════════════════════════════════════════════════════════════════════════
+                           📊 MÉTRICAS DO SISTEMA
+═══════════════════════════════════════════════════════════════════════════════
+
+Classes:               6 (CatalogoRAG, ProductRetriever, ContextAugmenter,
+                          ResponseGenerator, DatabaseManager, TextProcessor)
+Requisitos Funcionais: 14 (6 Alta, 5 Média, 3 Baixa)
+Cobertura:             100% implementado
+Tabelas BD:            1 (produtos - 18 campos)
+Índices:               3 (nome, categoria, preco)
+Produtos:              32
+Categorias:            4 (Calçados, Roupas, Acessórios, Fitness)
+
+═══════════════════════════════════════════════════════════════════════════════
+                          🎓 DICAS DE COMPREENSÃO
+═══════════════════════════════════════════════════════════════════════════════
+
+1. COMECE PELO FLUXO
+   Entenda: Usuário → CatalogoRAG → Retrieve → Augment → Generate → Resposta
+
+2. ENTENDA O RAG
+   R (Retrieve)  = Buscar dados reais (banco de dados)
+   A (Augment)   = Formatar contexto para IA
+   G (Generate)  = IA cria resposta natural
+
+3. CLASSES = RESPONSABILIDADES
+   Cada classe tem UMA responsabilidade principal
+   CatalogoRAG = Coordenar
+   ProductRetriever = Buscar
+   ContextAugmenter = Formatar
+   ResponseGenerator = Gerar com IA
+
+4. RASTREIE OS REQUISITOS
+   Cada requisito tem código correspondente
+   Use a matriz para encontrar implementação
+
+5. PENSE EM CAMADAS
+   Interface (CLI) → Lógica (RAG) → Dados (BD)
+
+═══════════════════════════════════════════════════════════════════════════════
+                              ✅ CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+Você entende o sistema quando consegue:
+  ☐ Explicar o que é RAG em 3 frases
+  ☐ Descrever o fluxo de uma consulta
+  ☐ Listar as 6 classes e suas funções
+  ☐ Identificar qual classe trata cada requisito
+  ☐ Explicar por que o sistema usa IA
+  ☐ Entender os 3 tipos de relacionamento
+  ☐ Mapear uma consulta real no código
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Versão 1.0  │  15/11/2025  │  Sistema RAG Catálogo de Produtos

@@ -1,0 +1,173 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        MODELAGEM FÍSICA - TABELA PRODUTOS                   │
+│                         Sistema RAG Catálogo de Produtos                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              📦 PRODUTOS                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🔑 IDENTIFICAÇÃO                                                           │
+│  ├─ id                    INTEGER      PK, AUTO_INCREMENT                  │
+│  └─ nome                  TEXT         NOT NULL, indexed                   │
+│                                                                             │
+│  🏷️  CLASSIFICAÇÃO                                                          │
+│  ├─ categoria             TEXT         NOT NULL, indexed                   │
+│  └─ subcategoria          TEXT         NULLABLE                            │
+│                                                                             │
+│  💰 PRECIFICAÇÃO                                                            │
+│  ├─ preco                 REAL         NOT NULL, indexed                   │
+│  └─ preco_promocional     REAL         NULLABLE                            │
+│                                                                             │
+│  🎨 CARACTERÍSTICAS                                                         │
+│  ├─ marca                 TEXT         NULLABLE                            │
+│  ├─ cor                   TEXT         NULLABLE                            │
+│  ├─ tamanho               TEXT         NULLABLE                            │
+│  └─ material              TEXT         NULLABLE                            │
+│                                                                             │
+│  📊 ESTOQUE                                                                 │
+│  └─ estoque               INTEGER      NOT NULL, DEFAULT 0                 │
+│                                                                             │
+│  📝 DESCRIÇÃO                                                               │
+│  ├─ descricao             TEXT         NULLABLE                            │
+│  └─ especificacoes        TEXT         NULLABLE                            │
+│                                                                             │
+│  ⭐ AVALIAÇÕES                                                              │
+│  ├─ avaliacao             REAL         CHECK(0.0 ≤ x ≤ 5.0)               │
+│  └─ num_avaliacoes        INTEGER      DEFAULT 0                           │
+│                                                                             │
+│  📦 ESPECIFICAÇÕES FÍSICAS                                                  │
+│  ├─ peso                  REAL         NULLABLE (kg)                       │
+│  └─ dimensoes             TEXT         NULLABLE (LxAxP cm)                 │
+│                                                                             │
+│  🕐 AUDITORIA                                                               │
+│  └─ data_cadastro         TIMESTAMP    DEFAULT CURRENT_TIMESTAMP           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              🔍 ÍNDICES                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  📌 idx_nome          →  nome         (Buscas textuais)                    │
+│  📌 idx_categoria     →  categoria    (Filtros por categoria)              │
+│  📌 idx_preco         →  preco        (Filtros e ordenação por preço)      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            ⚙️  CONSTRAINTS                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ✓ PRIMARY KEY          →  id (AUTOINCREMENT)                              │
+│  ✓ NOT NULL             →  nome, categoria, preco, estoque                 │
+│  ✓ CHECK                →  avaliacao BETWEEN 0.0 AND 5.0                   │
+│  ✓ DEFAULT              →  estoque = 0                                     │
+│  ✓ DEFAULT              →  data_cadastro = CURRENT_TIMESTAMP               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             🔐 TRIGGERS                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🛡️  trg_validar_preco_promocional                                         │
+│     ├─ Evento: BEFORE INSERT                                               │
+│     ├─ Condição: preco_promocional IS NOT NULL                             │
+│     └─ Validação: preco_promocional < preco                                │
+│                                                                             │
+│  🛡️  trg_validar_estoque                                                   │
+│     ├─ Evento: BEFORE UPDATE                                               │
+│     ├─ Condição: estoque < 0                                               │
+│     └─ Validação: RAISE ABORT                                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          📊 ESTATÍSTICAS ATUAIS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Total de Produtos:      32                                                │
+│  Categorias:             4 (Calçados, Roupas, Acessórios, Fitness)         │
+│  Faixa de Preços:        R$ 24,90 - R$ 499,90                              │
+│  Preço Médio:            R$ 156,23                                          │
+│  Produtos em Promoção:   ~70%                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        🔄 INTEGRAÇÃO COM SISTEMA RAG                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1️⃣  RETRIEVAL (ProductRetriever)                                          │
+│      └─ Busca produtos usando índices e filtros                            │
+│                                                                             │
+│  2️⃣  AUGMENTED (ContextAugmenter)                                          │
+│      └─ Formata produtos em contexto para LLM                              │
+│                                                                             │
+│  3️⃣  GENERATION (ResponseGenerator)                                        │
+│      └─ Gera resposta usando Claude via AWS Bedrock                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         💡 EXEMPLO DE REGISTRO                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  id:                  2                                                    │
+│  nome:                Tênis Nike Air Max                                   │
+│  categoria:           Calçados                                             │
+│  subcategoria:        Tênis                                                │
+│  preco:               499.90                                               │
+│  preco_promocional:   449.90                                               │
+│  marca:               Nike                                                 │
+│  cor:                 Branco/Preto                                         │
+│  tamanho:             40                                                   │
+│  material:            Tecido/Borracha                                      │
+│  estoque:             45                                                   │
+│  descricao:           Tênis esportivo com tecnologia Air Max...            │
+│  especificacoes:      Amortecimento Air, cabedal respirável...             │
+│  avaliacao:           4.8                                                  │
+│  num_avaliacoes:      1523                                                 │
+│  peso:                0.85                                                 │
+│  dimensoes:           30x20x12cm                                           │
+│  data_cadastro:       2025-11-16 00:26:48                                  │
+│                                                                             │
+│  💡 Desconto:          10% (economiza R$ 50,00)                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        📋 CATEGORIAS SUPORTADAS                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  👟 CALÇADOS                                                                │
+│     ├─ Sandálias                                                           │
+│     ├─ Tênis                                                               │
+│     ├─ Sapatos                                                             │
+│     ├─ Botas                                                               │
+│     └─ Chinelos                                                            │
+│                                                                             │
+│  👕 ROUPAS                                                                  │
+│     ├─ Camisetas                                                           │
+│     ├─ Vestidos                                                            │
+│     ├─ Calças                                                              │
+│     ├─ Shorts                                                              │
+│     └─ Jaquetas                                                            │
+│                                                                             │
+│  👜 ACESSÓRIOS                                                              │
+│     ├─ Óculos                                                              │
+│     ├─ Bolsas                                                              │
+│     ├─ Relógios                                                            │
+│     ├─ Cintos                                                              │
+│     └─ Carteiras                                                           │
+│                                                                             │
+│  🏃 FITNESS                                                                 │
+│     ├─ Roupas de treino                                                    │
+│     └─ Equipamentos                                                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+  Versão: 1.0  │  Data: 15/11/2025  │  SGBD: SQLite 3  │  Codificação: UTF-8
+═══════════════════════════════════════════════════════════════════════════════

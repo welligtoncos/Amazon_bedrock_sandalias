@@ -1,0 +1,40 @@
+erDiagram
+    PRODUTOS {
+        INTEGER id PK "AUTO_INCREMENT"
+        TEXT nome "NOT NULL, indexed"
+        TEXT categoria "NOT NULL, indexed"
+        TEXT subcategoria "NULLABLE"
+        REAL preco "NOT NULL, indexed"
+        REAL preco_promocional "NULLABLE"
+        TEXT marca "NULLABLE"
+        TEXT cor "NULLABLE"
+        TEXT tamanho "NULLABLE"
+        TEXT material "NULLABLE"
+        INTEGER estoque "NOT NULL"
+        TEXT descricao "NULLABLE"
+        TEXT especificacoes "NULLABLE"
+        REAL avaliacao "NULLABLE (0.0-5.0)"
+        INTEGER num_avaliacoes "NULLABLE"
+        REAL peso "NULLABLE (kg)"
+        TEXT dimensoes "NULLABLE (formato: LxAxP cm)"
+        TIMESTAMP data_cadastro "DEFAULT CURRENT_TIMESTAMP"
+    }
+    
+    %% Notas sobre a modelagem
+    %%
+    %% ÍNDICES CRIADOS:
+    %% - idx_nome: Otimiza buscas por nome de produto
+    %% - idx_categoria: Otimiza filtros por categoria
+    %% - idx_preco: Otimiza filtros e ordenação por preço
+    %%
+    %% CATEGORIAS PRINCIPAIS:
+    %% - Calçados (Sandálias, Tênis, Sapatos, Botas)
+    %% - Roupas (Camisetas, Vestidos, Calças, Jaquetas)
+    %% - Acessórios (Óculos, Bolsas, Relógios, Cintos)
+    %% - Fitness (Roupas fitness, Equipamentos)
+    %%
+    %% REGRAS DE NEGÓCIO:
+    %% - Produtos com preco_promocional têm desconto ativo
+    %% - Avaliação varia de 0.0 a 5.0
+    %% - Estoque mínimo recomendado: 10 unidades
+    %% - Data de cadastro registra automaticamente timestamp

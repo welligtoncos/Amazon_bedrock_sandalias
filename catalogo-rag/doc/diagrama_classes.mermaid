@@ -1,0 +1,88 @@
+classDiagram
+    %% Classe Principal - Orquestra todo o pipeline RAG
+    class CatalogoRAG {
+        -ProductRetriever retriever
+        -ContextAugmenter augmenter
+        -ResponseGenerator generator
+        -DatabaseManager db
+        +processar_consulta(query: str) str
+        +mostrar_estatisticas() void
+    }
+
+    %% RETRIEVAL - Recuperação de Produtos
+    class ProductRetriever {
+        -DatabaseManager db
+        -TextProcessor processor
+        +retrieve(query: str, limit: int) list~dict~
+    }
+
+    %% AUGMENTED - Aumento de Contexto
+    class ContextAugmenter {
+        +format_product(produto: dict)$ str
+        +augment(produtos: list, query: str)$ str
+    }
+
+    %% GENERATION - Geração de Respostas
+    class ResponseGenerator {
+        -boto3.Client client
+        -ChatBedrock model
+        -list~str~ historico
+        +generate(query: str, context: str) str
+        -_get_historico() str
+    }
+
+    %% Gerenciamento de Dados
+    class DatabaseManager {
+        -str db_path
+        +get_connection() Connection
+        +buscar_produtos(filtros: dict, limit: int) list~dict~
+        +get_estatisticas() dict
+        -_format_results(results: list) list~dict~
+    }
+
+    %% Processamento de Texto
+    class TextProcessor {
+        +STOP_WORDS: set$ 
+        +CATEGORIAS: list$
+        +remover_acentos(texto: str)$ str
+        +singular(palavra: str)$ str
+        +extrair_palavras_chave(texto: str)$ list~str~
+        +extrair_filtros(texto: str)$ dict
+    }
+
+    %% Bibliotecas Externas (representação simplificada)
+    class ChatBedrock {
+        <<external>>
+        +invoke(messages: list) Response
+    }
+
+    class boto3Client {
+        <<external>>
+        +bedrock-runtime
+    }
+
+    %% Relacionamentos - Composição
+    CatalogoRAG *-- ProductRetriever : contém
+    CatalogoRAG *-- ContextAugmenter : contém
+    CatalogoRAG *-- ResponseGenerator : contém
+    CatalogoRAG *-- DatabaseManager : contém
+
+    %% Relacionamentos - Associação
+    ProductRetriever --> DatabaseManager : usa
+    ProductRetriever --> TextProcessor : usa
+    ResponseGenerator --> ChatBedrock : usa
+    ResponseGenerator --> boto3Client : usa
+
+    %% Dependências
+    DatabaseManager ..> sqlite3 : <<usa>>
+    TextProcessor ..> re : <<usa>>
+    TextProcessor ..> unicodedata : <<usa>>
+
+    %% Notas explicativas
+    note for CatalogoRAG "Classe principal que implementa\no pipeline RAG completo:\n1. RETRIEVAL\n2. AUGMENTED\n3. GENERATION"
+    
+    note for ProductRetriever "Responsável por buscar\nprodutos relevantes no\ncatálogo usando filtros\ne palavras-chave"
+    
+    note for ContextAugmenter "Formata produtos em\ncontexto legível para\no modelo LLM"
+    
+    note for ResponseGenerator "Gera respostas usando\nClaude via AWS Bedrock\ncom histórico de conversa"
