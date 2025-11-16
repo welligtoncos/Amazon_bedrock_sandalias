@@ -1,6 +1,4 @@
-# docker-compose.yml
-
-version: '3.8'
+# docker-compose.yml (SIMPLIFICADO)
 
 services:
   chatbot:
@@ -15,29 +13,13 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=us-east-1
     volumes:
-      # Montar banco de dados (desenvolvimento)
       - ./data:/app/data
-      # Montar código (hot reload)
       - ./app.py:/app/app.py
       - ./rag:/app/rag
       - ./config:/app/config
     stdin_open: true
     tty: true
     restart: unless-stopped
-    networks:
-      - catalogo-network
-
-  # Opcional: Nginx para servir frontend
-  web:
-    image: nginx:alpine
-    container_name: catalogo-web
-    ports:
-      - "80:80"
-    volumes:
-      - ./frontend/build:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - chatbot
     networks:
       - catalogo-network
 
