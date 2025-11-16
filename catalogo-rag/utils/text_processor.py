@@ -1,72 +1,103 @@
 import re
 import unicodedata
 
+
 class TextProcessor:
-    """Processador de texto para extração de informações"""
-    
+    """Processador de texto avançado para consultas naturais."""
+
     STOP_WORDS = {
-        'o', 'a', 'de', 'da', 'do', 'em', 'para', 'com', 'os', 'as',
-        'um', 'uma', 'e', 'é', 'eh', 'que', 'na', 'no', 'tem', 'têm', 'ter',
-        'qual', 'quais', 'você', 'voce', 'vocês', 'voces', 'possui', 'ha', 'há',
-        'quero', 'comprar', 'procuro', 'busco', 'gostaria', 'preciso',
-        'quanto', 'custa', 'custam', 'preço', 'preco', 'preços', 'precos', 
-        'valor', 'valores', 'cor', 'cores'
+        'o', 'a', 'os', 'as', 'um', 'uma',
+        'de', 'da', 'do', 'das', 'dos',
+        'em', 'para', 'com', 'por',
+        'que', 'eh', 'é', 'na', 'no',
+        'tem', 'têm', 'ha', 'há',
+        'quero', 'procuro', 'gostaria',
+        'comprar', 'busco', 'preciso',
+        'quanto', 'preco', 'preço', 'valor'
     }
-    
-    CATEGORIAS = ['calçados', 'calcados', 'calcado', 'roupas', 'roupa', 'acessórios', 'acessorios', 'fitness']
-    
+
+    # categorias ampliadas
+    CATEGORIAS = {
+        "calçados", "calcado", "sandalias", "sandalia",
+        "tenis", "tênis", "botas", "sapatos",
+        "roupas", "camiseta", "camisa", "calca", "jeans",
+        "acessorios", "bolsa", "mochila"
+    }
+
     @staticmethod
     def remover_acentos(texto):
-        """Remove acentos do texto"""
-        nfkd = unicodedata.normalize('NFKD', texto)
-        return "".join([c for c in nfkd if not unicodedata.combining(c)])
-    
+        """Remove acentos"""
+        return ''.join(
+            c for c in unicodedata.normalize('NFKD', texto)
+            if not unicodedata.combining(c)
+        )
+
     @staticmethod
     def singular(palavra):
-        """Converte palavra para singular"""
-        if palavra.endswith('s') and len(palavra) > 3:
+        """Melhor singularização"""
+        if palavra.endswith("ões"):
+            return palavra[:-3] + "ao"
+        if palavra.endswith("s") and len(palavra) > 3:
             return palavra[:-1]
         return palavra
-    
+
     @classmethod
     def extrair_palavras_chave(cls, texto):
-        """Extrai palavras-chave relevantes"""
+        """Extrai keywords para busca texto-livre."""
         texto_limpo = cls.remover_acentos(texto.lower())
-        texto_limpo = re.sub(r'[^\w\s]', ' ', texto_limpo)
-        
+        texto_limpo = re.sub(r'[^a-z0-9\s]', ' ', texto_limpo)
+
         palavras = texto_limpo.split()
-        palavras_filtradas = []
-        
+        keywords = []
+
         for palavra in palavras:
-            if palavra not in cls.STOP_WORDS and len(palavra) > 2:
-                palavra_singular = cls.singular(palavra)
-                palavras_filtradas.append(palavra_singular)
-        
+            if palavra in cls.STOP_WORDS:
+                continue
+
+            if len(palavra) < 3:
+                continue
+
+            palavra = cls.singular(palavra)
+            keywords.append(palavra)
+
         # Fallback
-        if not palavras_filtradas:
-            palavras_filtradas = [p for p in palavras if len(p) > 3]
-        
-        return palavras_filtradas
-    
+        if not keywords:
+            keywords = [p for p in palavras if len(p) > 3]
+
+        return keywords
+
     @classmethod
     def extrair_filtros(cls, texto):
-        """Extrai filtros da consulta do usuário"""
+        """Extrai filtros estruturados (categoria, preços, etc.)"""
         filtros = {}
-        
-        # Extrair categoria
-        texto_lower = cls.remover_acentos(texto.lower())
+
+        texto_limpo = cls.remover_acentos(texto.lower())
+
+        # Categoria
         for cat in cls.CATEGORIAS:
-            if cat in texto_lower:
-                filtros['categoria'] = cat
+            if cat in texto_limpo:
+                filtros["categoria"] = cat
                 break
-        
-        # Extrair faixa de preço
-        preco_match = re.search(r'(?:até|menos|abaixo)\s*(?:de\s*)?r?\$?\s*(\d+(?:,\d{2})?)', texto_lower)
-        if preco_match:
-            filtros['preco_max'] = float(preco_match.group(1).replace(',', '.'))
-        
-        preco_match = re.search(r'(?:acima|mais|a partir)\s*(?:de\s*)?r?\$?\s*(\d+(?:,\d{2})?)', texto_lower)
-        if preco_match:
-            filtros['preco_min'] = float(preco_match.group(1).replace(',', '.'))
-        
+
+        # Preço máximo
+        max_match = re.search(
+            r"(?:ate|menos que|abaixo de|maximo|ate por)\s*r?\$?\s*(\d+(?:,\d{2})?)",
+            texto_limpo
+        )
+        if max_match:
+            filtros["preco_max"] = float(max_match.group(1).replace(",", "."))
+
+        # Preço mínimo
+        min_match = re.search(
+            r"(?:acima de|mais de|apartir de|a partir de|minimo)\s*r?\$?\s*(\d+(?:,\d{2})?)",
+            texto_limpo
+        )
+        if min_match:
+            filtros["preco_min"] = float(min_match.group(1).replace(",", "."))
+
+        # Termos de busca
+        termos = cls.extrair_palavras_chave(texto)
+        if termos:
+            filtros["termos"] = termos
+
         return filtros
